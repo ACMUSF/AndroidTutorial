@@ -1,6 +1,8 @@
 package usfacm.com.androidtutorial;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -41,15 +43,25 @@ public class MainActivity extends AppCompatActivity {
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapter, View item, int pos, long id) {
-                Context context = getApplicationContext();
-                CharSequence text = "Removed item " + items.get(pos) + " to to-do list";
-                int duration = Toast.LENGTH_SHORT;
-                Toast.makeText(context, text, duration).show();
-                // Remove the item within array at position
-                items.remove(pos);
-                // Refresh the adapter
-                itemsAdapter.notifyDataSetChanged();
-                // Return true consumes the long click event (marks it handled)
+                final int position = pos;
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setTitle("Confirm delete?");
+                alertDialog.setMessage("Are you sure you want to delete this?");
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Delete", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        items.remove(position);
+                        itemsAdapter.notifyDataSetChanged();
+                        CharSequence deleteToastText = "Deleted item successfully!";
+                        Toast deleteToast = Toast.makeText(MainActivity.this, deleteToastText, Toast.LENGTH_SHORT);
+                        deleteToast.show();
+                    }
+                });
+                alertDialog.show();
                 return true;
             }
         });
